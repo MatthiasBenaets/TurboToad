@@ -28,7 +28,7 @@ function love.load()
 	)
 
 	Menu.active = Menu.load:new(virtualWidth, virtualHeight, setState)
-	World.active = World.load:new(virtualWidth, virtualHeight)
+	World.active = World.load:new(virtualWidth, virtualHeight, setState)
 end
 
 function love.update(dt)
@@ -47,8 +47,15 @@ function love.draw()
 	Push:start()
 	if state == "menu" then
 		Menu.active:draw()
-	elseif state == "game" then
+	else
 		World.active:draw()
+		if state == "gameover" then
+			love.graphics.setColor(1, 0, 0, 1)
+			love.graphics.setFont(love.graphics.newFont(30))
+			love.graphics.printf("GAME OVER!", 0, virtualHeight / 2 - 15, virtualWidth, "center")
+			love.graphics.setFont(love.graphics.newFont(16))
+			love.graphics.printf("Press R to Restart", 0, virtualHeight / 2 + 30, virtualWidth, "center")
+		end
 	end
 	Push:finish()
 end
@@ -65,6 +72,11 @@ function love.keypressed(key)
 	if state == "game" then
 		if key == "space" then
 			World.active:playerJump()
+		end
+	elseif state == "gameover" then
+		if key == "r" then
+			setState("game")
+			World.active = World.load:new(virtualWidth, virtualHeight, setState)
 		end
 	end
 end

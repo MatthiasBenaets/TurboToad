@@ -32,7 +32,17 @@ local Enemy = {
 	nextSpawnTime = 0,
 }
 
-function World:new(virtualWidth, virtualHeight)
+function checkCollision(obj1, obj2)
+	local x1, y1, w1, h1 = obj1.x, obj1.y, obj1.width, obj1.height
+
+	local x2, y2 = obj2.x, obj2.y
+	local w2 = obj2.width * obj2.drawScale
+	local h2 = obj2.height * obj2.drawScale
+
+	return x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2
+end
+
+function World:new(virtualWidth, virtualHeight, setState)
 	local this = {
 		virtualWidth = virtualWidth,
 		virtualHeight = virtualHeight,
@@ -40,6 +50,7 @@ function World:new(virtualWidth, virtualHeight)
 		player = {},
 		background = {},
 		enemies = {},
+		setState = setState,
 	}
 
 	Player.active = Player.load:new(virtualWidth, virtualHeight, this.groundHeight)
@@ -79,6 +90,11 @@ function World:update(dt)
 	for i = #self.enemies, 1, -1 do
 		local enemy = self.enemies[i]
 		enemy:update(dt)
+
+		if checkCollision(Player.active, enemy) then
+			self.setState("gameover")
+			return
+		end
 
 		if enemy.x + enemy.width < 0 then
 			table.remove(self.enemies, i)
