@@ -21,13 +21,25 @@ local Background = {
 local Ground = {
 	load = require("lib.ground"),
 	active = function() end,
+	scrollSpeed = 100,
+}
+
+local Enemy = {
+	load = require("lib.enemy"),
+	spawnTimer = 0,
+	minSpawnTime = 3.0,
+	maxSpawnTime = 6.0,
+	nextSpawnTime = 0,
 }
 
 function World:new(virtualWidth, virtualHeight)
 	local this = {
+		virtualWidth = virtualWidth,
+		virtualHeight = virtualHeight,
 		groundHeight = virtualHeight * 0.8,
 		player = {},
 		background = {},
+		enemies = {},
 	}
 
 	Player.active = Player.load:new(virtualWidth, virtualHeight, this.groundHeight)
@@ -37,6 +49,8 @@ function World:new(virtualWidth, virtualHeight)
 	end
 
 	Ground.active = Ground.load:new(virtualWidth, virtualHeight, "assets/ground.png", 100)
+
+	Enemy.nextSpawnTime = love.math.random(Enemy.minSpawnTime * 100, Enemy.maxSpawnTime * 100) / 100
 
 	setmetatable(this, self)
 
@@ -50,6 +64,27 @@ function World:update(dt)
 
 	Ground.active:update(dt)
 
+	Enemy.spawnTimer = Enemy.spawnTimer + dt
+	if Enemy.spawnTimer >= Enemy.nextSpawnTime then
+		Enemy.spawnTimer = 0
+		Enemy.nextSpawnTime = love.math.random(Enemy.minSpawnTime * 100, Enemy.maxSpawnTime * 100) / 100
+
+		local newEnemy = Enemy.load:new(self.virtualWidth, self.virtualHeight, self.groundHeight, Ground.scrollSpeed)
+
+		newEnemy.x = self.virtualWidth + love.math.random(50, 200) -- Spawns between 50 and 200 pixels off-screen
+
+		table.insert(self.enemies, newEnemy)
+	end
+
+	for i = #self.enemies, 1, -1 do
+		local enemy = self.enemies[i]
+		enemy:update(dt)
+
+		if enemy.x + enemy.width < 0 then
+			table.remove(self.enemies, i)
+		end
+	end
+
 	Player.active:update(dt)
 end
 
@@ -59,6 +94,10 @@ function World:draw()
 	end
 
 	Ground.active:draw()
+
+	for _, enemy in ipairs(self.enemies) do
+		enemy:draw()
+	end
 
 	Player.active:draw()
 end
