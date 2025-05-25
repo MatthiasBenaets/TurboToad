@@ -1,17 +1,20 @@
-local push = require("lib.push")
+local Push = require("lib.push")
 local windowWidth, windowHeight = love.window.getDesktopDimensions()
 local virtualWidth, virtualHeight = 800, 600
 
-local state = "menu"
-
-local menu = {
+local Menu = {
 	load = require("menu"),
 	active = function() end,
 }
 
+local state = "menu"
+local function setState(newState)
+	state = newState
+end
+
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
-	push:setupScreen(
+	Push:setupScreen(
 		virtualWidth,
 		virtualHeight,
 		windowWidth,
@@ -19,19 +22,33 @@ function love.load()
 		{ fullscreen = false, vsync = true, resizable = true }
 	)
 
-	menu.active = menu.load:new()
+	Menu.active = Menu.load:new(virtualWidth, virtualHeight, setState)
 end
 
-function love.update(dt) end
+function love.update(dt)
+	if state == "menu" then
+		Menu.active:update(dt)
+	elseif state == "game" then
+	end
+end
 
 function love.resize(w, h)
-	push:resize(w, h)
+	Push:resize(w, h)
 end
 
 function love.draw()
-	push:start()
+	Push:start()
 	if state == "menu" then
-		menu.active:draw()
+		Menu.active:draw()
+	elseif state == "game" then
 	end
-	push:finish()
+	Push:finish()
+end
+
+function love.mousepressed(x, y, button, istouch)
+	local virtualX, virtualY = Push:toGame(x, y)
+	if state == "menu" then
+		Menu.active:mousepressed(virtualX, virtualY, button, istouch)
+	elseif state == "game" then
+	end
 end
