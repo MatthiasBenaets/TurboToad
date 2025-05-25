@@ -27,8 +27,8 @@ local Ground = {
 local Enemy = {
 	load = require("lib.enemy"),
 	spawnTimer = 0,
-	minSpawnTime = 2,
-	maxSpawnTime = 4,
+	minSpawnTime = 1,
+	maxSpawnTime = 3,
 	nextSpawnTime = 0,
 }
 
@@ -64,6 +64,9 @@ function World:new(virtualWidth, virtualHeight, setState)
 		background = {},
 		enemies = {},
 		setState = setState,
+		gameSpeed = 200,
+		speedIncreaseRate = 10,
+		maxGameSpeed = 600,
 	}
 
 	Player.active = Player.load:new(virtualWidth, virtualHeight, this.groundHeight)
@@ -82,8 +85,22 @@ function World:new(virtualWidth, virtualHeight, setState)
 end
 
 function World:update(dt)
-	for _, bg in ipairs(self.background) do
-		bg:update(dt)
+	self.gameSpeed = math.min(self.gameSpeed + (self.speedIncreaseRate * dt), self.maxGameSpeed)
+
+	-- Update ground scroll speed directly
+	Ground.active.bgScrollSpeed = self.gameSpeed
+
+	for i, bg in ipairs(self.background) do
+		-- Check if it's the fastest layer (assuming plx-5.png is the last one)
+		if i == #Background.layers then
+			-- Scale the fastest background layer's speed based on the current gameSpeed
+			-- Calculate a ratio from its original speed to the new gameSpeed
+			local originalSpeed = Background.layers[i][2] -- Get the original '200'
+			local scaledSpeed = originalSpeed * (self.gameSpeed / 200) -- Scale it
+			bg:update(dt * (scaledSpeed / originalSpeed)) -- Apply scaled dt for the fastest layer
+		else
+			bg:update(dt) -- Other layers update normally
+		end
 	end
 
 	Ground.active:update(dt)
@@ -93,7 +110,7 @@ function World:update(dt)
 		Enemy.spawnTimer = 0
 		Enemy.nextSpawnTime = love.math.random(Enemy.minSpawnTime * 100, Enemy.maxSpawnTime * 100) / 100
 
-		local newEnemy = Enemy.load:new(self.virtualWidth, self.virtualHeight, self.groundHeight, Ground.scrollSpeed)
+		local newEnemy = Enemy.load:new(self.virtualWidth, self.virtualHeight, self.groundHeight, self.gameSpeed)
 
 		newEnemy.x = self.virtualWidth + love.math.random(50, 200) -- Spawns between 50 and 200 pixels off-screen
 
