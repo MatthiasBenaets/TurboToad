@@ -102,4 +102,10 @@ function World:draw()
 	Player.active:draw()
 end
 
+function World:playerJump()
+	if Player.active then
+		Player.active:jump()
+	end
+end
+
 return World

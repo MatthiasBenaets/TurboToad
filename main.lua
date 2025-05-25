@@ -60,3 +60,11 @@ function love.mousepressed(x, y, button, istouch)
 	elseif state == "game" then
 	end
 end
+
+function love.keypressed(key)
+	if state == "game" then
+		if key == "space" then
+			World.active:playerJump()
+		end
+	end
+end
