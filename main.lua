@@ -7,6 +7,11 @@ local Menu = {
 	active = function() end,
 }
 
+local World = {
+	load = require("world"),
+	active = function() end,
+}
+
 local state = "menu"
 local function setState(newState)
 	state = newState
@@ -23,12 +28,14 @@ function love.load()
 	)
 
 	Menu.active = Menu.load:new(virtualWidth, virtualHeight, setState)
+	World.active = World.load:new(virtualWidth, virtualHeight)
 end
 
 function love.update(dt)
 	if state == "menu" then
 		Menu.active:update(dt)
 	elseif state == "game" then
+		World.active:update(dt)
 	end
 end
 
@@ -41,6 +48,7 @@ function love.draw()
 	if state == "menu" then
 		Menu.active:draw()
 	elseif state == "game" then
+		World.active:draw()
 	end
 	Push:finish()
 end
