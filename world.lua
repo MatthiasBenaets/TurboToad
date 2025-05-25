@@ -18,6 +18,11 @@ local Background = {
 	},
 }
 
+local Ground = {
+	load = require("lib.ground"),
+	active = function() end,
+}
+
 function World:new(virtualWidth, virtualHeight)
 	local this = {
 		groundHeight = virtualHeight * 0.8,
@@ -31,6 +36,8 @@ function World:new(virtualWidth, virtualHeight)
 		table.insert(this.background, Background.load:new(layer[1], layer[2]))
 	end
 
+	Ground.active = Ground.load:new(virtualWidth, virtualHeight, "assets/ground.png", 100)
+
 	setmetatable(this, self)
 
 	return this
@@ -41,6 +48,8 @@ function World:update(dt)
 		bg:update(dt)
 	end
 
+	Ground.active:update(dt)
+
 	Player.active:update(dt)
 end
 
@@ -48,6 +57,8 @@ function World:draw()
 	for _, bg in ipairs(self.background) do
 		bg:draw()
 	end
+
+	Ground.active:draw()
 
 	Player.active:draw()
 end
