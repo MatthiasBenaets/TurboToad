@@ -21,7 +21,7 @@ function Enemy:new(worldWidth, worldHeight, groundHeight, scrollSpeed)
 
 		scrollSpeed = scrollSpeed,
 
-		drawScale = love.math.random(1, 2),
+		drawScale = love.math.random(100, 200) / 100,
 	}
 
 	this.frameHeight = this.spriteSheet:getHeight()

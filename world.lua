@@ -14,30 +14,43 @@ local Background = {
 		{ "assets/plx-2.png", 12 },
 		{ "assets/plx-3.png", 25 },
 		{ "assets/plx-4.png", 50 },
-		{ "assets/plx-5.png", 100 },
+		{ "assets/plx-5.png", 200 },
 	},
 }
 
 local Ground = {
 	load = require("lib.ground"),
 	active = function() end,
-	scrollSpeed = 100,
+	scrollSpeed = 200,
 }
 
 local Enemy = {
 	load = require("lib.enemy"),
 	spawnTimer = 0,
-	minSpawnTime = 3.0,
-	maxSpawnTime = 6.0,
+	minSpawnTime = 2,
+	maxSpawnTime = 4,
 	nextSpawnTime = 0,
 }
 
-function checkCollision(obj1, obj2)
-	local x1, y1, w1, h1 = obj1.x, obj1.y, obj1.width, obj1.height
+local function checkCollision(obj1, obj2, padding)
+	-- If no padding is provided, default to 0
+	padding = padding or 0
 
+	local x1, y1, w1, h1 = obj1.x, obj1.y, obj1.width, obj1.height
 	local x2, y2 = obj2.x, obj2.y
 	local w2 = obj2.width * obj2.drawScale
 	local h2 = obj2.height * obj2.drawScale
+
+	-- Apply padding to shrink the hitboxes
+	x1 = x1 + padding
+	y1 = y1 + padding
+	w1 = w1 - (padding * 2)
+	h1 = h1 - (padding * 2)
+
+	x2 = x2 + padding
+	y2 = y2 + padding
+	w2 = w2 - (padding * 2)
+	h2 = h2 - (padding * 2)
 
 	return x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2
 end
@@ -59,7 +72,7 @@ function World:new(virtualWidth, virtualHeight, setState)
 		table.insert(this.background, Background.load:new(layer[1], layer[2]))
 	end
 
-	Ground.active = Ground.load:new(virtualWidth, virtualHeight, "assets/ground.png", 100)
+	Ground.active = Ground.load:new(virtualWidth, virtualHeight, "assets/ground.png", 200)
 
 	Enemy.nextSpawnTime = love.math.random(Enemy.minSpawnTime * 100, Enemy.maxSpawnTime * 100) / 100
 
@@ -91,7 +104,7 @@ function World:update(dt)
 		local enemy = self.enemies[i]
 		enemy:update(dt)
 
-		if checkCollision(Player.active, enemy) then
+		if checkCollision(Player.active, enemy, 10) then
 			self.setState("gameover")
 			return
 		end

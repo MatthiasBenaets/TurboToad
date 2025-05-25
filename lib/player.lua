@@ -22,7 +22,7 @@ function Player:new(worldWidth, worldHeight, groundHeight)
 
 		isJumping = false,
 		velocityY = 0,
-		gravity = 800,
+		gravity = 600,
 		jumpStrength = -400,
 		groundY = groundHeight,
 	}
