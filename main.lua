@@ -1,6 +1,7 @@
 local Push = require("lib.push")
 local windowWidth, windowHeight = love.window.getDesktopDimensions()
 local virtualWidth, virtualHeight = 800, 600
+local score = 0
 
 local Menu = {
 	load = require("menu"),
@@ -35,6 +36,7 @@ function love.update(dt)
 	if state == "menu" then
 		Menu.active:update(dt)
 	elseif state == "game" then
+		score = score + dt
 		World.active:update(dt)
 	end
 end
@@ -49,12 +51,17 @@ function love.draw()
 		Menu.active:draw()
 	else
 		World.active:draw()
+		love.graphics.setColor(0.92, 0.51, 0.14, 1)
+		love.graphics.setFont(love.graphics.newFont(30))
+		love.graphics.printf("Score: " .. math.floor(score), 0, 0, virtualWidth, "left")
 		if state == "gameover" then
 			love.graphics.setColor(1, 0, 0, 1)
 			love.graphics.setFont(love.graphics.newFont(30))
 			love.graphics.printf("GAME OVER!", 0, virtualHeight / 2 - 15, virtualWidth, "center")
 			love.graphics.setFont(love.graphics.newFont(16))
-			love.graphics.printf("Press R to Restart", 0, virtualHeight / 2 + 30, virtualWidth, "center")
+			love.graphics.printf("Score:" .. math.floor(score), 0, virtualHeight / 2 + 30, virtualWidth, "center")
+			love.graphics.setFont(love.graphics.newFont(16))
+			love.graphics.printf("Press R to Restart", 0, virtualHeight / 2 + 75, virtualWidth, "center")
 		end
 	end
 	Push:finish()
@@ -75,6 +82,7 @@ function love.keypressed(key)
 		end
 	elseif state == "gameover" then
 		if key == "r" then
+			score = 0
 			setState("game")
 			World.active = World.load:new(virtualWidth, virtualHeight, setState)
 		end
