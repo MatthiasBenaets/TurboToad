@@ -7,19 +7,29 @@ local menu = {
 	instance = {},
 }
 
+local play = {
+	class = require("src/gamestates/Play"),
+	instance = {},
+}
+
 function game.load()
 	menu.instance = menu.class:load()
+	play.instance = play.class:load()
 end
 
 function game.update(dt)
 	if game.state == "menu" then
 		menu.instance:update(dt)
+	elseif game.state == "play" then
+		play.instance:update(dt)
 	end
 end
 
 function game.draw()
 	if game.state == "menu" then
 		menu.instance:draw()
+	elseif game.state == "play" then
+		play.instance:draw()
 	end
 end
 
