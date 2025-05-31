@@ -2,6 +2,8 @@ local Play = {}
 
 Play.__index = Play
 
+local collision = require("src/components/collision")
+
 local ground = {
 	class = require("src/world/Ground"),
 	instance = {},
@@ -68,6 +70,12 @@ function Play:update(dt)
 
 	for _, mob in ipairs(self.enemies) do
 		mob:update(dt)
+	end
+
+	for _, mob in ipairs(self.enemies) do
+		if collision.check(player.instance, mob) then
+			print("DEAD")
+		end
 	end
 end
 
