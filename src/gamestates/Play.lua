@@ -33,7 +33,9 @@ function Play:load()
 	return this
 end
 
-function Play:update(dt) end
+function Play:update(dt)
+	player.instance:update(dt)
+end
 
 function Play:draw()
 	love.graphics.setColor(1, 1, 1, 1)
@@ -41,6 +43,12 @@ function Play:draw()
 
 	ground.instance:draw()
 	player.instance:draw()
+end
+
+function Play:keypressed(key)
+	if key == "space" then
+		player.instance:jump()
+	end
 end
 
 return Play

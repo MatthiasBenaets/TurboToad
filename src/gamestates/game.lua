@@ -43,4 +43,10 @@ function game.mousepressed(x, y, button)
 	end
 end
 
+function game.keypressed(key)
+	if game.state == "play" then
+		play.instance:keypressed(key)
+	end
+end
+
 return game

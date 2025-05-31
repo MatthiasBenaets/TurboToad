@@ -15,3 +15,7 @@ end
 function love.mousepressed(x, y, button)
 	game.mousepressed(x, y, button)
 end
+
+function love.keypressed(key)
+	game.keypressed(key)
+end
