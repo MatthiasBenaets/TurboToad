@@ -4,6 +4,11 @@ Play.__index = Play
 
 local collision = require("src/components/collision")
 
+local score = {
+	class = require("src/components/Score"),
+	instance = {},
+}
+
 local ground = {
 	class = require("src/world/Ground"),
 	instance = {},
@@ -41,6 +46,7 @@ function Play:load()
 		enemies = {},
 	}
 
+	score.instance = score.class:load()
 	ground.instance = ground.class:load(this.ground.width, this.ground.height)
 	player.instance = player.class:load(this.player.width, this.player.height, this.player.offset, this.ground.height)
 	enemy.spawnTimer = math.random(enemy.minSpawnTimer, enemy.maxSpawnTimer) / 1000
@@ -51,6 +57,8 @@ function Play:load()
 end
 
 function Play:update(dt)
+	score.instance:update(dt)
+
 	player.instance:update(dt)
 
 	enemy.spawnTimer = enemy.spawnTimer - dt
@@ -83,6 +91,7 @@ function Play:draw()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.print("Play", 0, 0)
 
+	score.instance:draw()
 	ground.instance:draw()
 	player.instance:draw()
 	for _, mob in ipairs(self.enemies) do
