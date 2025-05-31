@@ -12,8 +12,12 @@ local play = {
 	instance = {},
 }
 
+local function setState(state)
+	game.state = state
+end
+
 function game.load()
-	menu.instance = menu.class:load()
+	menu.instance = menu.class:load(setState)
 	play.instance = play.class:load()
 end
 
@@ -30,6 +34,12 @@ function game.draw()
 		menu.instance:draw()
 	elseif game.state == "play" then
 		play.instance:draw()
+	end
+end
+
+function game.mousepressed(x, y, button)
+	if game.state == "menu" then
+		menu.instance:mousepressed(x, y, button)
 	end
 end
 
