@@ -7,15 +7,26 @@ local ground = {
 	instance = {},
 }
 
+local player = {
+	class = require("src/entities/Player"),
+	instance = {},
+}
+
 function Play:load()
 	local this = {
 		ground = {
 			width = 32,
 			height = 32,
 		},
+		player = {
+			width = 32,
+			height = 32,
+			offset = 10,
+		},
 	}
 
 	ground.instance = ground.class:load(this.ground.width, this.ground.height)
+	player.instance = player.class:load(this.player.width, this.player.height, this.player.offset, this.ground.height)
 
 	setmetatable(this, self)
 
@@ -29,6 +40,7 @@ function Play:draw()
 	love.graphics.print("Play", 0, 0)
 
 	ground.instance:draw()
+	player.instance:draw()
 end
 
 return Play
