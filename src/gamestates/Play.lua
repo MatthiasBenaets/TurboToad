@@ -60,7 +60,7 @@ function Play:load(players)
 			},
 		},
 		enemyTimers = {},
-		colors = { 1, 0.5 },
+		colors = { 1, 0.8 },
 	}
 
 	for _, layer in ipairs(this.background.images) do

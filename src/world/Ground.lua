@@ -25,7 +25,7 @@ function Ground:update(dt)
 end
 
 function Ground:draw()
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(self.color, self.color, self.color, 1)
 	local width = self.sprite:getWidth()
 	local y = love.graphics.getHeight() - self.h
 
