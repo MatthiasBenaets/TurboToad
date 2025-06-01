@@ -24,12 +24,16 @@ local enemy = {
 	maxSpawnTimer = 4000,
 }
 
+local background = require("src/world/Background")
+
+local speed = 200
+
 function Play:load(players)
 	local this = {
 		ground = {
 			width = 32,
 			height = 50,
-			speed = 200,
+			speed = speed,
 		},
 		player = {
 			width = 32,
@@ -45,9 +49,23 @@ function Play:load(players)
 		players = {},
 		grounds = {},
 		enemies = {},
+		background = {
+			layers = {},
+			images = {
+				{ "assets/images/plx-1.png", speed / 16 },
+				{ "assets/images/plx-2.png", speed / 8 },
+				{ "assets/images/plx-3.png", speed / 4 },
+				{ "assets/images/plx-4.png", speed / 2 },
+				{ "assets/images/plx-5.png", speed },
+			},
+		},
 		enemyTimers = {},
 		colors = { 1, 0.5 },
 	}
+
+	for _, layer in ipairs(this.background.images) do
+		table.insert(this.background.layers, background:new(layer[1], layer[2]))
+	end
 
 	score.instance = score.class:load()
 
@@ -80,6 +98,10 @@ end
 
 function Play:update(dt)
 	score.instance:update(dt)
+
+	for _, bg in ipairs(self.background.layers) do
+		bg:update(dt)
+	end
 
 	for _, char in ipairs(self.players) do
 		char:update(dt)
@@ -121,6 +143,12 @@ function Play:update(dt)
 end
 
 function Play:draw()
+	for _, bg in ipairs(self.background.layers) do
+		bg:draw()
+	end
+
+	score.instance:draw()
+
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.print("Play", 0, 0)
 
