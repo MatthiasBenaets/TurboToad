@@ -9,10 +9,7 @@ local score = {
 	instance = {},
 }
 
-local ground = {
-	class = require("src/world/Ground"),
-	instance = {},
-}
+local ground = require("src/world/Ground")
 
 local player = {
 	class = require("src/entities/Player"),
@@ -45,9 +42,12 @@ function Play:load(players)
 			width = 32,
 			height = 32,
 		},
-		offset = 150,
+		offset = 100,
 		players = {},
-		grounds = {},
+		grounds = {
+			layers = {},
+			image = "assets/images/ground.png",
+		},
 		enemies = {},
 		background = {
 			layers = {},
@@ -83,8 +83,14 @@ function Play:load(players)
 		)
 
 		table.insert(
-			this.grounds,
-			ground.class:load(this.ground.width, this.ground.height + (i - 1) * this.offset, this.colors[i])
+			this.grounds.layers,
+			ground:load(
+				this.ground.width,
+				this.ground.height + (i - 1) * this.offset,
+				this.colors[i],
+				this.grounds.image,
+				speed
+			)
 		)
 
 		this.enemies[i] = {}
@@ -101,6 +107,10 @@ function Play:update(dt)
 
 	for _, bg in ipairs(self.background.layers) do
 		bg:update(dt)
+	end
+
+	for _, gr in ipairs(self.grounds.layers) do
+		gr:update(dt)
 	end
 
 	for _, char in ipairs(self.players) do
@@ -153,7 +163,7 @@ function Play:draw()
 	love.graphics.print("Play", 0, 0)
 
 	for i = #self.players, 1, -1 do
-		self.grounds[i]:draw()
+		self.grounds.layers[i]:draw()
 		self.players[i]:draw()
 		for _, mob in ipairs(self.enemies[i]) do
 			mob:draw()
