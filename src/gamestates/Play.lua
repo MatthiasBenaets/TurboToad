@@ -164,10 +164,10 @@ function Play:draw()
 
 	for i = #self.players, 1, -1 do
 		self.grounds.layers[i]:draw()
-		self.players[i]:draw()
 		for _, mob in ipairs(self.enemies[i]) do
 			mob:draw()
 		end
+		self.players[i]:draw()
 	end
 end
 

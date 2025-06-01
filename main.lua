@@ -1,5 +1,7 @@
 local game = require("src/gamestates/game")
 
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 function love.load()
 	game.load()
 end
