@@ -1,15 +1,45 @@
-local Menu = {}
+local menu = {}
 
-Menu.__index = Menu
+menu.__index = menu
 
-local Button = require("src/components/Button")
+local Button = require("src/components/button")
 
-function Menu:load(setState)
+function menu:load(setGame)
 	local this = {
-		buttons = {
-			Button:load("Play", 0, 50, 100, 50, function()
-				setState("play")
+		state = "main",
+		players = 1,
+		maxplayers = 2,
+		buttons = {},
+	}
+
+	this.buttons = {
+		{
+			obj = Button:load("play", 0, 50, 100, 50, function()
+				this.state = "select"
 			end),
+			visible = "main",
+		},
+		{
+			obj = Button:load("-", 0, 50, 100, 50, function()
+				if this.players > 1 then
+					this.players = this.players - 1
+				end
+			end),
+			visible = "select",
+		},
+		{
+			obj = Button:load("+", 300, 50, 100, 50, function()
+				if this.players < this.maxplayers then
+					this.players = this.players + 1
+				end
+			end),
+			visible = "select",
+		},
+		{
+			obj = Button:load("start", 150, 100, 100, 50, function()
+				setGame("play", this.players)
+			end),
+			visible = "select",
 		},
 	}
 
@@ -18,25 +48,37 @@ function Menu:load(setState)
 	return this
 end
 
-function Menu:update(dt)
+function menu:update(dt)
 	for _, btn in ipairs(self.buttons) do
-		btn:update(dt)
+		if btn.visible == self.state then
+			btn.obj:update(dt)
+		end
 	end
 end
 
-function Menu:draw()
+function menu:draw()
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.print("Menu", 0, 0)
+
+	if self.state == "main" then
+		love.graphics.print("main", 0, 0)
+	elseif self.state == "select" then
+		love.graphics.print("select", 0, 0)
+		love.graphics.print("players: " .. self.players, 150, 50)
+	end
 
 	for _, btn in ipairs(self.buttons) do
-		btn:draw()
+		if btn.visible == self.state then
+			btn.obj:draw()
+		end
 	end
 end
 
-function Menu:mousepressed(x, y, button)
+function menu:mousepressed(x, y, button)
 	for _, btn in ipairs(self.buttons) do
-		btn:mousepressed(x, y, button)
+		if btn.visible == self.state then
+			btn.obj:mousepressed(x, y, button)
+		end
 	end
 end
 
-return Menu
+return menu

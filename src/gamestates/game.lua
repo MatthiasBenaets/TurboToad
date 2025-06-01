@@ -1,5 +1,6 @@
 local game = {
 	state = "menu",
+	players = 1,
 }
 
 local menu = {
@@ -12,13 +13,17 @@ local play = {
 	instance = {},
 }
 
-local function setState(state)
+local function setGame(state, players)
 	game.state = state
+	game.players = players
+
+	if state == "play" then
+		play.instance = play.class:load(players)
+	end
 end
 
 function game.load()
-	menu.instance = menu.class:load(setState)
-	play.instance = play.class:load()
+	menu.instance = menu.class:load(setGame)
 end
 
 function game.update(dt)

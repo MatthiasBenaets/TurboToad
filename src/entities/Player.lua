@@ -2,12 +2,14 @@ local Player = {}
 
 Player.__index = Player
 
-function Player:load(w, h, offset, ground)
+function Player:load(w, h, offset, ground, key, color)
 	local this = {
 		x = love.graphics.getWidth() / offset,
 		y = love.graphics.getHeight() - ground - h,
 		w = w,
 		h = h,
+		key = key,
+		color = color,
 
 		jumping = false,
 		velocity = 0,
@@ -36,7 +38,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
-	love.graphics.setColor(1, 0, 0, 1)
+	love.graphics.setColor(self.color, 0, 0, 1)
 	love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 end
 
