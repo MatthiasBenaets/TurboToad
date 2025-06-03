@@ -13,6 +13,8 @@ local play = {
 	instance = {},
 }
 
+local font
+
 local function setGame(state, players)
 	game.state = state
 	game.players = players
@@ -23,6 +25,9 @@ local function setGame(state, players)
 end
 
 function game.load()
+	font = love.graphics.newFont("assets/fonts/font.ttf", 24)
+	love.graphics.setFont(font)
+
 	menu.instance = menu.class:load(setGame)
 end
 
