@@ -159,9 +159,6 @@ function Play:draw()
 
 	score.instance:draw()
 
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.print("Play", 0, 0)
-
 	for i = #self.players, 1, -1 do
 		self.grounds.layers[i]:draw()
 		for _, mob in ipairs(self.enemies[i]) do

@@ -17,7 +17,7 @@ function Score:update(dt)
 end
 
 function Score:draw()
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(0.92, 0.51, 0.14, 1)
 	love.graphics.print("Score: " .. math.floor(self.score), 50, 50)
 end
 
