@@ -25,7 +25,7 @@ local background = require("src/world/Background")
 
 local speed = 200
 
-function Play:load(players)
+function Play:load(players, setGame)
 	local this = {
 		ground = {
 			width = 32,
@@ -42,7 +42,9 @@ function Play:load(players)
 			width = 32,
 			height = 32,
 		},
+		state = "play",
 		offset = 100,
+		setGame = setGame,
 		players = {},
 		grounds = {
 			layers = {},
@@ -103,50 +105,52 @@ function Play:load(players)
 end
 
 function Play:update(dt)
-	score.instance:update(dt)
+	if self.state == "play" then
+		score.instance:update(dt)
 
-	for _, bg in ipairs(self.background.layers) do
-		bg:update(dt)
-	end
+		for _, bg in ipairs(self.background.layers) do
+			bg:update(dt)
+		end
 
-	for _, gr in ipairs(self.grounds.layers) do
-		gr:update(dt)
-	end
+		for _, gr in ipairs(self.grounds.layers) do
+			gr:update(dt)
+		end
 
-	for _, char in ipairs(self.players) do
-		char:update(dt)
-	end
+		for _, char in ipairs(self.players) do
+			char:update(dt)
+		end
 
-	for i = 1, #self.players do
-		self.enemyTimers[i] = self.enemyTimers[i] - dt
+		for i = 1, #self.players do
+			self.enemyTimers[i] = self.enemyTimers[i] - dt
 
-		if self.enemyTimers[i] <= 0 then
-			table.insert(
-				self.enemies[i],
-				enemy.class:load(
-					love.graphics.getWidth() + self.enemy.width,
-					love.graphics.getHeight() - self.ground.height - (i - 1) * self.offset - self.enemy.height,
-					self.enemy.width,
-					self.enemy.height,
-					self.ground.speed,
-					self.colors[i]
+			if self.enemyTimers[i] <= 0 then
+				table.insert(
+					self.enemies[i],
+					enemy.class:load(
+						love.graphics.getWidth() + self.enemy.width,
+						love.graphics.getHeight() - self.ground.height - (i - 1) * self.offset - self.enemy.height,
+						self.enemy.width,
+						self.enemy.height,
+						self.ground.speed,
+						self.colors[i]
+					)
 				)
-			)
-			self.enemyTimers[i] = math.random(enemy.minSpawnTimer, enemy.maxSpawnTimer) / 1000
+				self.enemyTimers[i] = math.random(enemy.minSpawnTimer, enemy.maxSpawnTimer) / 1000
+			end
 		end
-	end
 
-	for i = 1, #self.enemies do
-		for _, mob in ipairs(self.enemies[i]) do
-			mob:update(dt)
+		for i = 1, #self.enemies do
+			for _, mob in ipairs(self.enemies[i]) do
+				mob:update(dt)
+			end
 		end
-	end
 
-	for i = 1, #self.enemies do
-		local char = self.players[i]
-		for _, mob in ipairs(self.enemies[i]) do
-			if collision.check(char, mob) then
-				print("Player " .. i .. " DEAD")
+		for i = 1, #self.enemies do
+			local char = self.players[i]
+			for _, mob in ipairs(self.enemies[i]) do
+				if collision.check(char, mob) then
+					self.state = "gameover"
+				end
 			end
 		end
 	end
@@ -166,6 +170,20 @@ function Play:draw()
 		end
 		self.players[i]:draw()
 	end
+
+	if self.state == "gameover" then
+		love.graphics.setColor(0.92, 0.51, 0.14, 1)
+		love.graphics.print(
+			"Game Over",
+			love.graphics.getWidth() / 2 - love.graphics.getFont():getWidth("Game Over") / 2,
+			love.graphics.getHeight() / 2
+		)
+		love.graphics.print(
+			"Press 'R' to restart",
+			love.graphics.getWidth() / 2 - love.graphics.getFont():getWidth("Press 'R' to restart") / 2,
+			love.graphics.getHeight() / 2 + 50
+		)
+	end
 end
 
 function Play:keypressed(key)
@@ -173,6 +191,10 @@ function Play:keypressed(key)
 		if key == char.key then
 			char:jump()
 		end
+	end
+
+	if key == "r" and self.state == "gameover" then
+		self.setGame("play", #self.players)
 	end
 end
 

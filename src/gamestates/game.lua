@@ -20,7 +20,7 @@ local function setGame(state, players)
 	game.players = players
 
 	if state == "play" then
-		play.instance = play.class:load(players)
+		play.instance = play.class:load(players, setGame)
 	end
 end
 
